@@ -1,1 +1,0 @@
-[10-Jun-2011 23:08:02] PHP Fatal error:  Call to undefined function  get_header() in /home/hkricesc/public_html/blog/wp-content/themes/ineo.1.0.2/index.php on line 2
