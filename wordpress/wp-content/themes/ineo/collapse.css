@@ -1,0 +1,12 @@
+body{background:#E9E9E9}
+#container{width:998px;margin:0 auto;border-left:3px solid #DDD;border-right:3px solid #DDD;background:#F9F9F9}
+#header{background:#F9F9F9}
+#header .inner{background:#F2F2F2 url(img/sprite.png) repeat-x 50% -60px;height:90px;}
+#navigation{background:#F9F9F9;border:none}
+#navigation .inner{background:#E9E9E9;border-bottom:1px solid #CCC;}
+#content {border:none}
+#content .inner{border-top-color:#DDDDDD;border-top-style:solid;border-top-width:2px;}
+#footer{width:auto}
+#header,#navigation,#content,#footer{border-left:1px solid #CCC;border-right:1px solid #CCC}
+#content .inner,#header .inner,#navigation .inner,#footer .inner{padding:0 18px}
+a#back-to-top{left:50%;margin-left:427px;width:20px}
