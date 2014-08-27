@@ -30,6 +30,9 @@ if (is_home () || is_front_page ()) {
 			<?php if ($paged > 1) echo '<span class="archive_page"> | '. sprintf(__('Page %s','zborder'), $paged) .'</span>'; ?>
 		</div>
 	<?php endif; ?>
+	
+	<!-- 幻灯片短代码 -->
+	<?php echo do_shortcode("[metaslider id=206]"); ?>
 
 	<?php while (have_posts()) : the_post();?>
 
