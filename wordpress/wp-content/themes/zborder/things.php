@@ -13,7 +13,8 @@ Template Name:创意饰品
 		&raquo; <?php the_title(); ?>
 	</div>
 	<div class="post post_s" id="post-<?php the_ID(); ?>">
-		<?php the_title( '<h1 class="title title_s">', '</h1>' ); ?>
+		<?php the_title( '<h1  class="title title_s">', '</h1>' ); ?>
+		<span style="color:gray"><?php  the_excerpt() ;?></span>
 		<div class="p_meta_s_t">
 			
 			<span class="jtxs_bg"></span>

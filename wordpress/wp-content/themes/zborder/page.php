@@ -8,6 +8,7 @@
 	</div>
 	<div class="post post_s" id="post-<?php the_ID(); ?>">
 		<?php the_title( '<h1 class="title title_s">', '</h1>' ); ?>
+		
 		<div class="p_meta_s_t">
 			<?php edit_post_link( __( 'Edit', 'zborder' ), '[', ']' ); ?>
 			<?php if (comments_open()) : ?>
