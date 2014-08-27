@@ -6,6 +6,7 @@
 		<?php _e('You are here:', 'zborder'); ?> <a class="first_home" rel="nofollow" title="<?php _e('Go to homepage', 'zborder'); ?>" href="<?php echo home_url('/'); ?>"><?php _e('Home', 'zborder'); ?></a>
 		&raquo; <?php the_category(' &raquo; ', 'multiple'); ?> &raquo; <?php the_title(); ?>
 	</div>
+	
 	<div <?php post_class('post post_s'); ?> id="post-<?php the_ID(); ?>">
 		<?php the_title( '<h1 class="title title_s">', '</h1>' ); ?>
 		<div id="scroll_s_p" class="p_meta_s_t">
@@ -30,6 +31,7 @@
 			<p class="nav-previous"><?php previous_post_link( '&laquo; %link ', '%title' ); ?></p>
 			<p class="nav-next"><?php if (get_next_post()) { next_post_link( ' %link &raquo;', '%title' ); } else { _e('(This is the latest article)', 'zborder'); } ?></p>
 		</div>
+		
 	</div>
 
 	<?php comments_template( '', true ); ?>

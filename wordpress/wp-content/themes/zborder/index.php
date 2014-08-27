@@ -35,6 +35,7 @@ if (is_home () || is_front_page ()) {
 
 		<div <?php post_class('post'); ?> id="post-<?php the_ID(); ?>">
 			<?php the_title( '<h2 class="title"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h2>' ); ?>
+			
 			<div class="entry">
 				<?php if ( $zborder_theme_options['excerpt_check']=='true' ) { the_excerpt(__('read more','zborder')); } else { the_content(__('read more','zborder')); } ?>
 			</div>
@@ -63,6 +64,7 @@ if ($paged < 2 && is_sticky ()) {
 
 	<div class="post">
 		<h2 class="title"><?php _e('Error 404 - Not Found', 'zborder'); ?></h2>
+		
 		<div class="entry">
 			<p><?php _e('Sorry, but you are looking for something that isn&#8217;t here.', 'zborder'); ?></p>
 			<?php get_search_form(); ?>
