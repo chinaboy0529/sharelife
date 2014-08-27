@@ -220,9 +220,8 @@ hr{
 /* #search */
 #search{
 	position:relative;
-	right:400px;
 	float:right;
-	margin-top:75px;
+	margin-top:8px;
 	width:230px;
 	height:24px;
 	font-size:12px;
