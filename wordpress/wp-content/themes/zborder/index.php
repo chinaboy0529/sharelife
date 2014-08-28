@@ -1,6 +1,9 @@
 <?php get_header(); global $zborder_theme_options; ?>
 
 <div id="content">
+<!-- JiaThis Button BEGIN -->
+<script type="text/javascript" src="http://v3.jiathis.com/code/jiathis_r.js?uid=1409124835697401&move=0" charset="utf-8"></script>
+<!-- JiaThis Button END -->
 
 <?php if (have_posts()) : ?>
 
@@ -34,6 +37,9 @@ if (is_home () || is_front_page ()) {
 	<!-- 幻灯片短代码 -->
 	<?php echo do_shortcode("[metaslider id=206]"); ?>
 
+
+	
+	
 	<?php while (have_posts()) : the_post();?>
 
 		<div <?php post_class('post'); ?> id="post-<?php the_ID(); ?>">
