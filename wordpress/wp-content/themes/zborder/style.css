@@ -1668,7 +1668,7 @@ a {
 .guess_you_title span {
   border-left: 5px solid #388bff;
   float: left;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   padding-left: 12px;
 }
@@ -1693,3 +1693,72 @@ a {
 	}
 
 
+.aboutlist {
+  display: inline;
+  float: left;
+  margin-top: 0;
+  max-height: 220px;
+  overflow: hidden;
+  padding-top: 12px;
+  width: 640px;
+}
+
+ .aboutkeywords {
+  border-bottom: 1px solid #ececec;
+  font-size: 14px;
+  font-weight: bold;
+  height: 22px;
+  margin-top: 18px;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  text-align: left;
+}
+
+.aboutlist li {
+  background: url("imgs/dot_0b3b8c.gif") no-repeat scroll left 50% rgba(0, 0, 0, 0);
+  display: inline-block;
+  float: left;
+  height: 28px;
+  line-height: 28px;
+  overflow: hidden;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: left;
+  width: 300px;
+}
+
+
+
+/**
+ * 侧边栏最近文章推荐
+ */
+
+
+#sidebar .s_related img {
+  height: 50px;
+  margin: 5px 10px 5px 0;
+  vertical-align: middle;
+  width: 50px;
+}
+
+#sidebar ul {
+  
+  line-height: 1.7em;
+  list-style-type: none;
+  margin-left: -2px;
+  padding: 0 20px 15px;
+}
+
+#sidebar .s_related li {
+  border-bottom: 1px dotted #c8c7cc;
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+#sidebar .s_related img {
+  height: 50px;
+  margin: 5px 10px 5px 0;
+  vertical-align: middle;
+  width: 50px;
+}

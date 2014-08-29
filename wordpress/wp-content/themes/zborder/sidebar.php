@@ -44,6 +44,15 @@
 	</div>
 
 <?php endif; ?>
+
+<div class="box" id="float">
+<h3>Related Posts</h3><ul class="s_related"><li><a href="http://jandan.net/2013/12/16/your-makeup.html"><img src="http://tankr.net/s/square/5WOG.jpg">你的化妆品安全吗</a></li><li><a href="http://jandan.net/2014/03/05/blood-death.html"><img src="http://tankr.net/s/square/RNAV.jpg">新的血液检测法，可以测出你是否死期已近</a></li><li><a href="http://jandan.net/2014/06/20/coconut-water.html"><img src="http://tankr.net/s/square/JGIF.jpg">涨姿势：要什么运动饮料，椰子汁足矣</a></li><li><a href="http://jandan.net/2014/06/15/rye-bread.html"><img src="http://tankr.net/s/square/J4A6.jpg">纯燕麦面包表示：白面包和全麦面包当然不行，我才是最健康的</a></li><li><a href="http://jandan.net/2014/06/15/reasons-to-eat-bread.html"><img src="http://tankr.net/s/square/2W7J.jpg">管它全麦还是白面：17个吃面包的理由</a></li></ul>
+<ul style="padding:6px;">
+</ul>
+</div>
+
+
+
 <script type="text/javascript">
 /*【边栏】--上--250*250*/
 var cpro_id = "u1314631";

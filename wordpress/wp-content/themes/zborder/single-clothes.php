@@ -38,9 +38,18 @@
 			<p class="nav-next"><?php if (get_next_post()) { next_post_link( ' %link &raquo;', '%title' ); } else { _e('(This is the latest article)', 'zborder'); } ?></p>
 		</div>
 
+
+
 		<div class='span'></div>
 
-<div id="guess_you_title" class="guess_you_title"><div class="sbg"><span>猜你喜欢</span></div></div>
+		
+
+
+		<div id="guess_you_title" class="guess_you_title">
+			<div class="sbg">
+				<span>相关阅读</span>
+			</div>
+		</div>
 
 		<div id="guess_you" class="guess_you">
 			<ul>
