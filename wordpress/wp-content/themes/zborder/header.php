@@ -61,7 +61,7 @@
 				<h2 class="site_desc"><?php bloginfo('description');?></h2>
 				
 			
-				<div class='ads'><img src='http://cache.adm.cnzz.net/material/08/4/212e6fd41f8c92583190d974aa716.png'></div>
+				<div class='ads'><img src='http://img3.yxlady.com/cdd/UploadADPic/20140515/2014051500422224.jpg'></div>
 				
 				<div id="rss">
 				<?php

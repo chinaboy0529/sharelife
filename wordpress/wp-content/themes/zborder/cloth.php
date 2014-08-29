@@ -32,7 +32,7 @@ Template Name:服饰配搭类
 		
 		
 		<div style="width:226px;height: 240px;float: left;margin-left: 10px;background-color: #ffffff;border:1px solid #d7d7d7;margin-bottom: 10px;">
-        <a href="<?php echo esc_url( get_permalink() ) ?>" target="_blank">
+        <a href="<?php echo esc_url( get_permalink() ) ?>" target="_self">
           <img style="width: 180px;height: 175px;margin: 13px;margin-bottom: 8px;" src="<?php echo  wp_get_attachment_url( get_post_thumbnail_id($post->ID) )?>">
         </a>
         <div style="margin-left: 13px;margin-right: 13px;">
