@@ -36,10 +36,7 @@
 						<li><?php _e('Menu', 'zborder') ?></li>
 					</ul>
 				</div>
-					<div id="search">
-				<?php get_search_form(); ?>
-			</div>
-				
+			
 				<div class="clear">
 				
 				
