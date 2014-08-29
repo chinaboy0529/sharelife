@@ -40,7 +40,7 @@
 
 		<div class='span'></div>
 
-<div id="guess_you_title" class="guess_you_title"><div class="sbg"><span>猜你喜欢</span><a target="_blank" onclick="loadguessdom()" class="guess_change">换一批</a></div></div>
+<div id="guess_you_title" class="guess_you_title"><div class="sbg"><span>猜你喜欢</span></div></div>
 
 		<div id="guess_you" class="guess_you">
 			<ul>
