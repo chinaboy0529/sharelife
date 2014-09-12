@@ -7,7 +7,7 @@ $GLOBALS['EUC2SJIS'] = false;
 $GLOBALS['UTF82SJIS'] = true;
 
 
-//  î[ ïi èë 
+//  å‰å©êœèë 
 
 class MYPDF extends MBFPDF
 {
