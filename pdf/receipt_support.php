@@ -1,5 +1,6 @@
 <?php
 require('mbfpdf.php');
+require('utfConvert.php');
 //require('gsupport.php');
 
 //$GLOBALS['EUC2SJIS'] = true;
@@ -7,17 +8,53 @@ $GLOBALS['EUC2SJIS'] = false;
 $GLOBALS['UTF82SJIS'] = true;
 
 
-// 
+
+//post data parser
+class TempData
+{
+  	var $mSerialNo;//No.
+  	var $mTime;	//領収日付
+    	var $mCustomName;	//お客様名
+	var $mPrice	;  //領収金額
+        var $mClause	;  //但し書
+	var  $mRemark;//備
+	
+	
+	//start parse post data
+	function init($postArray)
+	{
+	   $de_json = json_decode($postArray,TRUE);
+           $count_json = count($de_json);
+	 
+           for ($i = 0; $i < $count_json; $i++)
+             {
+		
+		  $helper =new Utf2ShifJis();
+		  $this->mTime = $de_json[$i]['mTime'];
+                  $this->mSerialNo = $de_json[$i]['mSerialNo'];
+		  $this->mCustomName = $helper->convert( $de_json[$i]['mCustomName']); 
+		  $this->mPrice = $de_json[$i]['mPrice'];
+		  $this->mRemark = $helper->convert( $de_json[$i]['mRemark']);;
+		  $this->mClause = $helper->convert( $de_json[$i]['mClause']);
+                }
+		return true;
+		
+	}
+	
+	
+}
+
+
+
 
 class MYPDF extends MBFPDF
 {
         var $currentY;
-
-
-
-	function init($aFile)
+        // [{"mTime":"2014/09/13","mSerialNo":"5555556","mCustomName":"金子","mPrice":"2,111","mClause":"テスト代","mRemark":"クレジットによりお支払い。"}]
+   
+	function init($post_data)
 	{
-		$this->tempfile = $aFile;
+		$this->tempdata = $post_data;
 		$this->fileList = array();
 	}
   
@@ -31,7 +68,7 @@ class MYPDF extends MBFPDF
 	{
 		$this->SetY(-15);
 		$this->SetFont(PMINCHO,'',8);
-		$this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+		$this->Cell(0,10,'Page '.$this->PageNo().'',0,0,'C');
 
 	}
 	
@@ -53,13 +90,13 @@ class MYPDF extends MBFPDF
 		
 		$this->SetXY(160, 35);
 		$this->SetFont(MINCHO,'',15);
-	 	$this->Cell(18,10,'No.55555',0,0,'L');
+	 	$this->Cell(18,10,'No.'.$this->tempdata->mSerialNo,0,0,'L');
 		
 		$this->Line(160, 43,  200, 43) ;
 		
 		$this->SetXY(160, 45);
 		$this->SetFont(MINCHO,'',15);
-	 	$this->Cell(18,10,'2014/09/05',0,0,'L');
+	 	$this->Cell(18,10,$this->tempdata->mTime,0,0,'L');
 		
 		$this->Line(160, 53,  200, 53) ;
 		
@@ -72,7 +109,7 @@ class MYPDF extends MBFPDF
 		
 		$this->SetXY(25, 80);
 		$this->SetFont(MINCHO,'B',25);
-	 	$this->Cell(18,10,'金子',0,0,'L');
+	 	$this->Cell(18,10,$this->tempdata->mCustomName,0,0,'L');
 		
 		$this->SetLineWidth(0.3);
 		$this->Line(25, 90,  190, 90) ;
@@ -87,12 +124,12 @@ class MYPDF extends MBFPDF
 		$this->SetFont(MINCHO,'B',25);
 		$this->SetXY(100, 115);
 		$this->SetFont(MINCHO,'',20);
-	 	$this->Cell(18,10,'￥1,111-',0,0,'L');
+	 	$this->Cell(18,10,'￥'.$this->tempdata->mPrice,0,0,'L');
 
 		
 	        $this->SetXY(100, 150);
 		$this->SetFont(MINCHO,'B',20);
-		$this->Cell(18,10,'テスト代',0,0,'L');
+		$this->Cell(18,10,$this->tempdata->mClause,0,0,'L');
 		
 		
 		$this->SetXY(45, 149);
@@ -114,7 +151,7 @@ class MYPDF extends MBFPDF
 		
 		$this->SetXY(25, 200);
 		$this->SetFont(MINCHO,'',12);
-		$this->Cell(18,10,'クレジットによりお支払い。',0,0,'L');
+		$this->Cell(18,10,$this->tempdata->mRemark,0,0,'L');
 		
 		
 		$this->SetLineWidth(0.2);
@@ -140,7 +177,7 @@ class MYPDF extends MBFPDF
 		$this->Cell(18,10,'TEL(03)5363-1873 FAX(03)5363-1887',0,0,'L');
 		
 		//add image
-		$this->Image('logo_large.png',150,239,45,45,0,0); 
+		$this->Image('image/logo_large.png',150,239,45,45,0,0); 
 		
 	}
 	
@@ -158,6 +195,41 @@ class MYPDF extends MBFPDF
 		
 	}
 	
+	
+	
+	//output pdf file
+	function innerOutputPDF()
+	{
+		$fName = $this->tempdata->mSerialNo. ".pdf";
+	
+		$this->Open();
+		//$pageCount = 0;
+		//while ($recordCount > 0) {
+		//	
+		//	$pageCount++;
+		//	$recordCount = $recordCount - $pageSize;
+		//}
+		//
+		
+			$this->AddPage();
+			$this->titleTable();
+			$this->headTable();
+			$this->body();
+			$this->bottomTable();
+			
+
+	
+		$filePath = '/generatefile/receipt_pdf/'.date("Ymdhisa");
+		if (!file_exists($filePath )) {
+			mkdir('.'.$filePath, 0777);
+		}
+		$fName = $filePath.'/'.$fName;
+	
+		$this->Output('.'.$fName ,'F');
+		
+		echo $fName;
+		return $fName;
+	}
 	
 	
 	

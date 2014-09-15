@@ -1,23 +1,69 @@
 <?php
 require('mbfpdf.php');
-//require('gsupport.php');
+require('utfConvert.php');
 
 //$GLOBALS['EUC2SJIS'] = true;
 $GLOBALS['EUC2SJIS'] = false;
 $GLOBALS['UTF82SJIS'] = true;
 
 
-//  御見積書 
+
+//post data parser
+
+//post data [{ "mProjectName":"株式会社ハナミ","mCoName":"御中","mRtime":"平成26年9月5日","mSerialNo":"555555","mAdress":"株式会社 ハナミ","mLeadman":"金子","mReqContent":"","mReqCharge":"","mAccount":"","mPayway":"お振込み" }]
+class TempData
+{
+  	var $mProjectName;//project Name.
+  	var $mCoName;	//co. Name
+    	var $mRtime;	//request time
+	var $mSerialNo	;  //request SerialNo
+        var $mAdress	;  //adress
+	var  $mLeadman;  //leader
+	var  $mReqContent;  //Request content
+        var  $mReqCharge;  //Request charge
+	var  $mAccount ; //Request Account
+        var  $mPayway;  //pay way
+
+	
+
+	//start parse post data
+	function init($postArray)
+	{
+	   $de_json = json_decode($postArray,TRUE);
+           $count_json = count($de_json);
+	 
+           for ($i = 0; $i < $count_json; $i++)
+             {
+		
+		  $helper = new Utf2ShifJis();
+		  $this->mProjectName = $helper->convert( $de_json[$i]['mProjectName']);
+		  $this->mCoName = $helper->convert( $de_json[$i]['mCoName']);
+                  $this->mRtime = $helper->convert( $de_json[$i]['mRtime']);
+                  $this->mSerialNo = $helper->convert( $de_json[$i]['mSerialNo']);
+		  $this->mAdress = $helper->convert( $de_json[$i]['mAdress']); 
+		  $this->mLeadman = $helper->convert( $de_json[$i]['mLeadman']);
+		  $this->mReqContent = $helper->convert( $de_json[$i]['mReqContent']);
+		  $this->mReqCharge = $helper->convert( $de_json[$i]['mReqCharge']);
+   		  $this->mAccount = $helper->convert( $de_json[$i]['mAccount']);
+    		  $this->mPayway = $helper->convert( $de_json[$i]['mPayway']);
+		}
+		return true;
+	}
+	
+	
+}
+
+
+//  請 求 書 
 
 class MYPDF extends MBFPDF
 {
         var $currentY;
+         var $tempdata;
 
-
-
-	function init($aFile)
+	function init($postdata)
 	{
-		$this->tempfile = $aFile;
+		$this->tempdata = $postdata;
 		$this->fileList = array();
 	}
   
@@ -44,12 +90,13 @@ class MYPDF extends MBFPDF
 		
 		$this->SetXY(10, 25);
 		$this->SetFont(MINCHO,'B',20);
-		$this->Cell(18,10,'株式会社ハナミ　御中',0,0,'L');
+		$this->Cell(18,10,$this->tempdata->mProjectName.'  '.$this->tempdata->mCoName,0,0,'L');
 		
 		
 		$this->SetXY(90, 25);
 		$this->SetFont(MINCHO,'B',25);
 		$this->Cell(18,10,'請 求 書',0,0,'L');
+		
 	}
 	
 	
@@ -57,14 +104,13 @@ class MYPDF extends MBFPDF
 	function headTable()
 	{
 		
-		
 		$this->SetXY(110, 35);
 		$this->SetFont(MINCHO,'B',12);
 		$this->Cell(18,10,'請求日',0,0,'L');
 		
 		$this->SetXY(140, 35);
 		$this->SetFont(MINCHO,'B',12);
-		$this->Cell(18,10,'平成26年9月5日',0,0,'L');
+		$this->Cell(18,10,$this->tempdata->mRtime,0,0,'L');
 		
 		
 		$this->SetXY(110, 40);
@@ -74,37 +120,50 @@ class MYPDF extends MBFPDF
 		
 		$this->SetXY(150, 40);
 		$this->SetFont(MINCHO,'B',12);
-		$this->Cell(18,10,'555555',0,0,'L');
+		$this->Cell(18,10,$this->tempdata->mSerialNo,0,0,'L');
 		
-		$this->SetXY(110, 50);
-		$this->SetFont(MINCHO,'B',12);
+		$this->SetXY(110, 45);
+		$this->SetFont(MINCHO,'B',11);
 		$this->Cell(18,10,'株式会社 ハナミ',0,0,'L');
 		
-		$this->SetXY(120, 55);
-		$this->SetFont(MINCHO,'B',12);
+		$this->SetXY(125, 50);
+		$this->SetFont(MINCHO,'B',11);
 		$this->Cell(18,10,'〒162-0801',0,0,'L');
 		
 		
-		$this->SetXY(120, 60);
-		$this->SetFont(MINCHO,'B',12);
+		$this->SetXY(125, 55);
+		$this->SetFont(MINCHO,'B',11);
 		$this->Cell(58,10,'東京都新宿区山吹町333',0,0,'L');
 		
 		
-		$this->SetXY(120, 65);
-		$this->SetFont(MINCHO,'B',12);
+		$this->SetXY(125, 60);
+		$this->SetFont(MINCHO,'B',11);
 		$this->Cell(58,10,'カーネ早稲田１F',0,0,'L');
 		
 		
+		$this->SetXY(125, 70);
+		$this->SetFont(MINCHO,'B',11);
+		$this->Cell(58,10,'担当:',0,0,'L');
+		
+		
+		$this->SetXY(135, 70);
+		$this->SetFont(MINCHO,'B',11);
+		$this->Cell(58,10,$this->tempdata->mLeadman,0,0,'L');
+		
+		$this->SetXY(125, 75);
+		$this->SetFont(MINCHO,'B',11);
+		$this->Cell(58,10,'0120-998-854',0,0,'L');
+		
 		
 		$this->SetXY(15, 75);
-		$this->SetFont(MINCHO,'B',12);
+		$this->SetFont(MINCHO,'B',11);
 		$this->Cell(58,10,'下記のとおりご請求申し上げます。',0,0,'L');
 		
 		
 		
 		//add image here
 		
-		$this->Image('logo.png',100,60,0,0); 
+		$this->Image('image/logo.png',100,60,0,0); 
 	}
 	
 	
@@ -166,7 +225,6 @@ class MYPDF extends MBFPDF
 	{
 		
 		$this->SetXY(25, 160);
-		
 		$this->SetLineWidth(0.8);
 		$this->Rect(25,160,150,35);
 		$this->SetFont(PMINCHO,'B',9);
@@ -190,8 +248,48 @@ class MYPDF extends MBFPDF
 		$this->SetFont(PMINCHO,'B',9);
 		$this->Cell(75,6,'<<お支払い方法>>',0,0,'L');
 		$this->SetXY(25,204);
-		$this->Cell(75,6,'お振込み',0,0,'L');
+		$this->Cell(75,6,$this->tempdata->mPayway,0,0,'L');
 		
+	}
+	
+	
+	
+	//output pdf file
+	function innerOutputPDF()
+	{
+		$fName = $this->tempdata->mSerialNo. ".pdf";
+		
+	
+		$this->Open();
+		
+	
+		//$pageCount = 0;
+		//while ($recordCount > 0) {
+		//	
+		//	$pageCount++;
+		//	$recordCount = $recordCount - $pageSize;
+		//}
+		//
+		
+			$this->AddPage();
+			$this->titleTable();
+			$this->headTable();
+			$this->itemTable();
+			$this->bottomTable();
+			
+
+	
+		$filePath = '/generatefile/requestBook_pdf/'.date("Ymdhisa");
+		if (!file_exists($filePath )) {
+			mkdir('.'.$filePath, 0777);
+		}
+		$fName = $filePath.'/'.$fName;
+		
+		$this->Output('.'.$fName ,'F');
+		
+		//$this->Output();
+		
+		return $fName;
 	}
 	
 	

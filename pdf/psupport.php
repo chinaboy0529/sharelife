@@ -1,10 +1,110 @@
 <?php
 require('mbfpdf.php');
-//require('gsupport.php');
+require('utfConvert.php');
 
 //$GLOBALS['EUC2SJIS'] = true;
 $GLOBALS['EUC2SJIS'] = false;
 $GLOBALS['UTF82SJIS'] = true;
+
+
+
+
+//post data parser
+class TempData
+{
+        var $mTime; //’•¶ŽžŠÔ  o‰×—\’è“ú
+  	var $mSerialNo;//Žó•t”Ô†
+  	var $mEmail;	//[ email ]
+  	var $mLeadman;	//[  
+	
+  	var $cName;	//[ ‹MŽÐ–¼ ]
+  	var $cPhone;	//[ “d˜b”Ô† ]
+  	var $mZip;	//[ —X•Ö”Ô† ]
+  	var $mCity;	//[ “s“¹•{Œ§ ]
+  	var $mTown;	//[ Žs‹æ’¬‘º ]
+  	var $mStreet;	//[ ’š–Ú”Ô’n ]
+  	var $mPayment;	//[ ‚¨Žx•¥•û–@ ]
+  	var $mDeliver;	//[ ‚²”[•i•û–@ ]
+  	var $mPrice;	//[ ‚¨Žx•¥‚¢‡Œv‹àŠz ]
+  	var $tName;		//[ ‚¨“Í‚¯æ‚¨–¼‘O ]
+	var $tCompany;	//[ ‚¨“Í‚¯æ‰ïŽÐ–¼ ]
+  	var $tPhone;	//[ ‚¨“Í‚¯æ“d˜b”Ô† ]
+	// 20140410 ’Ç‰Á start
+	
+	var $mStartTime;// start time
+	var $mArriveTime; //“ú•tŽw’è‚P
+	var $tZipCode;	//[ ‚¨“Í‚¯æ—X•Ö”Ô† ]
+	var $tCity;		//[ ‚¨“Í‚¯æ“s“¹•{Œ§ ]
+	var $tTown;		//[ ‚¨“Í‚¯æŽs‹æ’¬‘º ]
+	var $tStreet;	//[ ‚¨“Í‚¯æ’š–Ú”Ô’n ]
+	// 20140401 ’Ç‰Á end
+  	var $tAddress;	//[ ‚¨“Í‚¯æZŠ ]
+  
+  	var $mMemo;	//[ ”õl—“ ]
+  	var $mReceipt;//[ —ÌŽûØ ]
+  	var $mNameFlg;//•\Ž¦–¼ ŒÂl0 ˆÈŠO 1
+
+	var $mOs; // ‚²Žg—pOS
+	var $mSoft; //‚²Žg—pƒ\ƒtƒg
+	var $mSoftCheck; // “üe‘O‚Ìƒ`ƒFƒbƒN
+
+  	// for PDF
+  	var $mailFrom;
+  	var $pdfType; // PDF title
+  	var $pdfName; // custom title
+  
+  	
+
+	//u‘î”z•ÖˆË—ŠŽå–¼v¥nullˆ½yƒnŽžƒiƒ~–¼‹`zŽž 1
+	// y‚¨‹q—l–¼‹`z2
+	// ˆÈŠO 0
+	var $deliverMethod;
+
+	// •Ê‚Ì‚¨“Í‚¯æ‚ðŽw’è‚·‚éê‡ 1 
+	// ‚»‚Ì‘¼ 0
+	var $sendToOther;
+
+	var $historyFlg; // [ w“ü—ð ] ‚·‚Å‚É”Ì‘£‰ž‰‡‚É‚Äw“ü—ð‚ª‚ ‚è‚Ü‚· 1
+	var $firstProductName;
+        
+  [{"mTime":"20140908","mSerialNo":"","mEmail":"","cName":"","mLeadman":"","mDeliver":"","mPayment":"","mPrice":"","mArriveTime":"","pdfType":"","mStartTime":""}]
+	
+	//start parse post data
+	function init($postArray)
+	{
+	   $de_json = json_decode($postArray,TRUE);
+           $count_json = count($de_json);
+	   echo $count_json;
+           for ($i = 0; $i < $count_json; $i++)
+             {
+ 
+                  $helper =new Utf2ShifJis();
+		  $this->mTime = $de_json[$i]['mTime'];
+                  $this->mSerialNo = $de_json[$i]['mSerialNo'];
+		  $this->mEmail = $helper->convert( $de_json[$i]['mEmail']);
+		  $this->cName = $helper->convert( $de_json[$i]['cName']); 
+		  $this->mLeadman = $helper->convert( $de_json[$i]['mLeadman']); 
+		  $this->mDeliver = $helper->convert( $de_json[$i]['mDeliver']);
+		  $this->mPayment = $helper->convert( $de_json[$i]['mPayment']);
+		  $this->mPrice = $helper->convert( $de_json[$i]['mPrice']);
+		  $this->mArriveTime = $helper->convert( $de_json[$i]['mArriveTime']);
+		  $this->pdfType = $helper->convert( $de_json[$i]['pdfType']);
+		  $this->mStartTime; = $helper->convert( $de_json[$i]['mStartTime']);
+		  
+		  
+                }
+		return true;
+		
+	}
+	
+	
+}
+
+
+
+
+
+
 
 //  'ƒIƒ“ƒfƒ}ƒ“ƒhˆóüŽwŽ¦‘'	= 1
 //	'754ˆóüŽwŽ¦‘'		= 2
@@ -12,12 +112,12 @@ $GLOBALS['UTF82SJIS'] = true;
 
 class MYPDF extends MBFPDF
 {
-	var $tempfile;
+	var $tempdata;
 	var $fileList;
 
-	function init($aFile)
+	function init($data)
 	{
-		$this->tempfile = $aFile;
+		$this->tempdata = $data;
 		$this->fileList = array();
 	}
   
@@ -238,9 +338,9 @@ class MYPDF extends MBFPDF
 		$this->Cell(5,7,'',1,0,'C');
 		$this->Cell(52,7,'•i                –¼',1,0,'C');
 		$this->Cell(30,7,'        ŽdãƒTƒCƒY',1,0,'C');
-		$this->Cell(13,7,'     Ží  —Þ',1,0,'C');
-		$this->Cell(15,7,'     –‡  ”',1,0,'C');
-		$this->Cell(15,7,'     ‡Œv–‡”',1,0,'C');
+		$this->Cell(13,7,'   Ží  —Þ',1,0,'C');
+		$this->Cell(15,7,'   –‡  ”',1,0,'C');
+		$this->Cell(15,7,'   ‡Œv–‡”',1,0,'C');
 		$this->ln();
 	
 		$this->SetFont(MINCHO,'B',12);
@@ -663,63 +763,69 @@ class MYPDF extends MBFPDF
 			$y = $y + $step;
 		}
 	}
-	//
-	//function innerOutputPDF($type)
-	//{
-	//	$fName = $this->tempfile->mSerialNo . "_" . $type . ".pdf";
-	//
-	//	$cList = array();
-	//	if($type == 1){
-	//		$cList = $this->tempfile->products1;
-	//	} else if($type == 2){
-	//		$cList = $this->tempfile->products2;
-	//	} else if($type == 3){
-	//		$cList = $this->tempfile->products3;
-	//	}
-	//
-	//	$recordCount = count($cList);
-	//	if($recordCount == 0){
-	//		return '';
-	//	}
-	//
-	//	$this->Open();
-	//	
-	//	// yƒIƒ“ƒfzy754z¥3˜¢?•i
-	//	$pageSize = 3;
-	//	//y‘å”»z¥ˆê?4˜¢?•i
-	//	if($type == 3){
-	//		$pageSize = 4;
-	//	}
-	//
-	//	$pageCount = 0;
-	//	while ($recordCount > 0) {
-	//		
-	//		$pageCount++;
-	//		$recordCount = $recordCount - $pageSize;
-	//	}
-	//	
-	//	for($i=0;$i<$pageCount;$i++){
-	//		$this->AddPage();
-	//		$this->titleTable($type);
-	//		$this->infoTable();
-	//		$this->cartTable($i, $cList, $type);
-	//		$this->processTable($i, $cList, $type);
-	//		$this->packageTable();
-	//		$this->paymentTable();
-	//		$this->workTable();
-	//		$this->memoTable();
-	//		$this->memoTable2();
-	//	}
-	//
-	//	$filePath = '/generatefile/pdf/'.date("Ymd");
-	//	if (!file_exists($filePath )) {
-	//		mkdir('.'.$filePath, 0777);
-	//	}
-	//	$fName = $filePath.'/'.$fName;
-	//
-	//	$this->Output('.'.$fName ,'F');
-	//	return $fName;
-	//}
+	
+	
+	
+	//output pdf file
+	function innerOutputPDF($type)
+	{
+		
+		return $this->tempdata->mSerialNo;
+		
+		$fName = '20140411009970' . "_" . $type . ".pdf";
+	
+		$cList = array();
+		//if($type == 1){
+		//	$cList = $this->tempfile->products1;
+		//} else if($type == 2){
+		//	$cList = $this->tempfile->products2;
+		//} else if($type == 3){
+		//	$cList = $this->tempfile->products3;
+		//}
+	
+		$recordCount = 1;//count($cList);
+		if($recordCount == 0){
+			return '';
+		}
+	
+		$this->Open();
+		
+		// yƒIƒ“ƒfzy754z¥3˜¢?•i
+		$pageSize = 3;
+		//y‘å”»z¥ˆê?4˜¢?•i
+		if($type == 3){
+			$pageSize = 4;
+		}
+	
+		$pageCount = 0;
+		while ($recordCount > 0) {
+			
+			$pageCount++;
+			$recordCount = $recordCount - $pageSize;
+		}
+		
+		for($i=0;$i<$pageCount;$i++){
+			$this->AddPage();
+			$this->titleTable($type);
+			$this->infoTable();
+			$this->cartTable($i, null, $type);
+			$this->processTable($i, null, $type);
+			$this->packageTable();
+			$this->paymentTable();
+			$this->workTable();
+			$this->memoTable();
+			$this->memoTable2();
+		}
+	
+		$filePath = '/generatefile/pointBook_pdf/'.date("Ymdhisa");
+		if (!file_exists($filePath )) {
+			mkdir('.'.$filePath, 0777);
+		}
+		$fName = $filePath.'/'.$fName;
+	
+		$this->Output('.'.$fName ,'F');
+		return $fName;
+	}
 	//
 	//function Circle($x, $y, $r, $style='D')
 	//{
