@@ -9,6 +9,72 @@ $GLOBALS['UTF82SJIS'] = true;
 
 
 
+class Product {
+        var $mIndex;	// index
+  	var $name;		//品名
+  	var $size;		//サイズ
+  	var $kind;		//種類
+	var $mPaper;	//用紙
+  	var $mCount;	//枚数
+	var $mSum;
+  	var $process;	//加工
+  	var $tFlg;		//指示書名
+	var $mPreSendDate;		//発送予定日
+	var $mWishArriveDate;	//納品希望日
+  
+  	function init($line)
+  	{
+		$this->process = array();
+		$infoList = explode('$$', $line);
+
+		for ($i=0; $i<count($infoList); $i++){      
+      		$this->analysisLine($infoList[$i]);
+    	}
+
+		$this->mSum = $this->kind * $this->mCount;
+  	}
+  
+  	
+  
+  	function getProcess($line) {
+		$this->process[] = $this->split($line);
+	
+  	}
+  
+	function split ($str) {
+		$strList = explode('=', $str);
+		return trim($strList[1]);
+  	}
+
+	// 4月11日（金） to 20140411
+	function convertDate($str){
+		$strList = explode('月',$str);
+		$mouth = $strList[0];
+		$strList = explode('日',$strList[1]);
+		$day = $strList[0];
+		$ret =date('Ymd', mktime(0, 0, 0, $mouth, $day, date("Y")));
+		return $ret;
+	}
+  
+  	function getProductFlg($str){
+		global $ondeNames;
+		global $offsetNames;
+		global $bigPosters;
+
+		if(in_array($str,$ondeNames)){
+			return 1;//'オンデマンド印刷指示書';
+		}else if(in_array($str,$offsetNames)){
+			return 2;//'754印刷指示書';
+		}else if(in_array($str,$bigPosters)){
+			return 3;//'大判カラー印刷指示書';
+		}
+  	}
+}
+
+
+
+
+
 //post data parser
 class TempData
 {
@@ -30,7 +96,7 @@ class TempData
 	var $tCompany;	//[ お届け先会社名 ]
   	var $tPhone;	//[ お届け先電話番号 ]
 	// 20140410 追加 start
-	
+	var $pName;
 	var $mStartTime;// start time
 	var $mArriveTime; //日付指定１
 	var $tZipCode;	//[ お届け先郵便番号 ]
@@ -67,20 +133,26 @@ class TempData
 	var $historyFlg; // [ 購入歴 ] すでに販促応援にて購入歴があります 1
 	var $firstProductName;
         
-  [{"mTime":"20140908","mSerialNo":"","mEmail":"","cName":"","mLeadman":"","mDeliver":"","mPayment":"","mPrice":"","mArriveTime":"","pdfType":"","mStartTime":""}]
+	var $products1;
+  	var $products2;
+  	var $products3;
+	
+	//  [{"mTime":"20140908","mSerialNo":"243133","mEmail":"kongqingzheng@gmail.com","cName":"すでに販促応援にて購入歴があります","mLeadman":"小平","mDeliver":"発行","mPayment":"店頭支払","mPrice":"21487","mArriveTime":"20140912","pdfType":"1","cPhone":"01012333","mNameFlg":"1","historyFlg":"1","pName":"発送主電話番号","productList":[{"name":"CDフロントジャケット","size":"50","kind":"フロントジャケッ","mCount":"2"},{"name":"品代金","size":"50","kind":"フロントジャケッ","mCount":"2"}]}]
+
+
 	
 	//start parse post data
 	function init($postArray)
 	{
 	   $de_json = json_decode($postArray,TRUE);
            $count_json = count($de_json);
-	   echo $count_json;
+	// echo $count_json;
            for ($i = 0; $i < $count_json; $i++)
              {
- 
                   $helper =new Utf2ShifJis();
 		  $this->mTime = $de_json[$i]['mTime'];
                   $this->mSerialNo = $de_json[$i]['mSerialNo'];
+                  $this->cPhone = $de_json[$i]['cPhone'];
 		  $this->mEmail = $helper->convert( $de_json[$i]['mEmail']);
 		  $this->cName = $helper->convert( $de_json[$i]['cName']); 
 		  $this->mLeadman = $helper->convert( $de_json[$i]['mLeadman']); 
@@ -89,10 +161,56 @@ class TempData
 		  $this->mPrice = $helper->convert( $de_json[$i]['mPrice']);
 		  $this->mArriveTime = $helper->convert( $de_json[$i]['mArriveTime']);
 		  $this->pdfType = $helper->convert( $de_json[$i]['pdfType']);
-		  $this->mStartTime; = $helper->convert( $de_json[$i]['mStartTime']);
+		  //$this->mStartTime= $helper->convert( $de_json[$i]['mStartTime']);
+		  $this->cName= $helper->convert( $de_json[$i]['cName']);
+		  $this->mNameFlg= $helper->convert( $de_json[$i]['mNameFlg']);
+		  $this->historyFlg= $helper->convert( $de_json[$i]['historyFlg']);
+		  $this->pName= $helper->convert( $de_json[$i]['pName']);
+		  $p  = json_encode( $de_json[$i]['productList']);
 		  
+		  $productList = json_decode($p,TRUE);
+		
+		  
+		  
+		  if($this->pdfType=='1')
+		  {
+			
+	          for($k = 0; $k< count($productList); $k++)
+		      {
+			
+			$product =new Product();
+			$product->name =$helper->convert( $productList[$k]['name']);
+			$product->size =$helper->convert( $productList[$k]['size']);
+			$product->kind =$helper->convert( $productList[$k]['kind']);
+			$product->mCount =$helper->convert( $productList[$k]['mCount']);
+		        $this->products1[]=$product;
+			
+		     }
+		  }else if($this->pdfType=='2')
+		    for($k = 0; $k< count($productList); $k++)
+		      {
+			
+			$product =new Product();
+			$product->name =$helper->convert( $productList[$k]['name']);
+		        $this->products2[]=$product; 
+		       
+		       
+		     }
+		  
+		  else if($this->pdfType=='3')
+		    {
+		        for($k = 0; $k< count($productList); $k++)
+		      {
+			
+			$product =new Product();
+			$product->name =$helper->convert( $productList[$k]['name']);
+		        $this->products3[]=$product; 
+		     }
+		  }
 		  
                 }
+		
+		
 		return true;
 		
 	}
@@ -158,7 +276,7 @@ class MYPDF extends MBFPDF
 		*/
 	}
 	
-	function titleTable($type)
+	function titleTable($TYPE)
 	{
 
 		// 10 18  190  7
@@ -168,23 +286,21 @@ class MYPDF extends MBFPDF
 		$this->Cell(18,10,'WEB',0,0,'L');
 
 		$this->SetFont(MINCHO,'',18);
-		
-		if($type == 1){
+		if($TYPE == 1){
 			$str = 'オンデマンド印刷指示書';
-		} else if($type == 2){
+		} else if($TYPE == 2){
 			$str = '754印刷指示書';
-		} else if($type == 3){
+		} else if($TYPE == 3){
 			$str = '大判カラー印刷指示書';
 		}
 
 		$this->Cell(80,10,$str,0,0,'L');
-		
 		$this->SetFont(MINCHO,'',10);
 		$this->SetXY(100, 9);
-		$this->Cell(35,5,'23023423423',0,0,'L');
+		$this->Cell(35,5,$this->tempdata->mTime,0,0,'L');
 		$this->SetFont(MINCHO,'',10);
 		$this->SetXY(100, 12);
-		$this->Cell(35,5,'234234234',0,0,'L');
+		$this->Cell(35,5,$this->tempdata->mSerialNo,0,0,'L');
 		
 		$this->SetLineWidth(0.3);
 		$this->Rect(135,9,25,7);
@@ -235,23 +351,13 @@ class MYPDF extends MBFPDF
 		$this->Cell(15,7,'方法',0,0,'C');
 		
 		$displayName = "";
-		/*
-		if ($this->tempfile->mNameFlg == 1){
-	
-			if ($this->tempfile->historyFlg == 1){
-				$displayName = $this->tempfile->pName;
-			}else{
-				$displayName = $this->tempfile->cName;
-				$this->SetFont(MINCHO,'B',15);
-				$this->SetXY(70, 43);
-				$this->Cell(30,6,$this->tempfile->pName,0,0,'L');
-			}
-			
-		}else{
-			$displayName = $this->tempfile->pName;
-		}
-		*/
-	
+		
+		
+		
+		$this->SetFont(MINCHO,'B',15);
+		$this->SetXY(70, 43);
+		$this->Cell(30,6,$this->tempdata->mLeadman,0,0,'L');
+		
 		//if ($this->tempfile->mNameFlg == 1){
 		//	// Not 個人
 		//	if(mb_strlen($this->tempfile->cName) < 1){
@@ -270,16 +376,18 @@ class MYPDF extends MBFPDF
 		//	// 個人
 		//	$displayName = $this->tempfile->pName;
 		//}
+		
+		
 	
 		$this->SetFont(MINCHO,'B',22);
 		$this->SetXY(15, 24);
-		//$oneline = mb_substr($displayName, 0, 11);
-		$oneline = mb_substr('XIANSHIMINGZI', 0, 11);
+		$oneline = mb_substr($this->tempdata->cName, 0, 11);
+		
 		$this->Cell(90,9,$oneline,0,0,'L');
 	
 	
 		//$time = strtotime($this->tempfile->mTime );
-		$time = strtotime(20140711 );
+		$time = strtotime($this->tempdata->mTime );
 		$this->SetXY(115, 24);
 		$this->Cell(90,9,date("n", $time),0,0,'L');
 	
@@ -300,16 +408,21 @@ class MYPDF extends MBFPDF
 	
 		$this->SetFont(PMINCHO,'B',8);
 		$this->SetXY(23, 46);
-		//if ($this->tempfile->historyFlg == 1){
-		//	$this->Cell(0,0,$this->tempfile->mEmail,0,0,'L');
-		//}else{
-		//	$this->Cell(0,0,$this->tempfile->cPhone,0,0,'L');
-		//}
+		
+		
+		
+		if ($this->tempdata->mEmail != ''){
+			$this->Cell(0,0,$this->tempdata->mEmail,0,0,'L');
+		}else{
+			$this->Cell(0,0,$this->tempdata->cPhone,0,0,'L');
+		}
 	
 		$this->SetFont(PMINCHO,'B',25);
 		$this->SetXY(120, 34);
 		//$this->Cell(90,15,$this->tempfile->mDeliver,0,0,'C');
-		$this->Cell(90,15,'MDEVICE',0,0,'C');
+		$this->Cell(90,15,$this->tempdata->mDeliver,0,0,'C');
+		
+		
 	
 	}
 
@@ -396,6 +509,7 @@ class MYPDF extends MBFPDF
 		}
 		
 		$y = $sy + 7;
+		
 		for($j=$start;$j<$end;$j++){
 			
 			$this->SetXY($x + 5, $y);
@@ -558,7 +672,7 @@ class MYPDF extends MBFPDF
 		$this->SetFont(MINCHO,'',15);
 		
 		$this->SetXY(155, 75);
-		$this->Cell(30,20,trim('234234'),0,0,'L');
+		$this->Cell(30,20,trim( $this->tempdata->mPayment),0,0,'L');
 		$this->Ellipse(170,85,20,5);
 		
 		$this->SetXY($x, 109);
@@ -566,8 +680,8 @@ class MYPDF extends MBFPDF
 	
 		$this->SetFont(MINCHO,'B',25);
 	
-		$this->SetXY($x + 7, 109);
-		$this->Cell(50,5,number_format('234234'),0,0,'L');
+		$this->SetXY($x + 9, 109);
+		$this->Cell(50,5,number_format($this->tempdata->mPrice),0,0,'L');
 		$this->SetFont(PMINCHO,'',15);
 		$this->SetXY(190, 109);
 		$this->Cell(15,6,'デ',0,0,'C');	
@@ -588,24 +702,22 @@ class MYPDF extends MBFPDF
 		
 		//$this->Line($x + 3, 137, 196, 137);
 		$this->SetXY($x, 138);
-		$this->Cell(68,6,'(                )日発送(                )日着',0,0,'C');
+		$this->Cell(60,6,'(                )日発送(                )日着',0,0,'C');
 	
 	
 		$this->SetFont(MINCHO,'B',20);
 	
-		$this->SetXY($x + 3, 138);
-		$this->Cell(10,6,$this->getDisplayDate('20140906'),0,0,'L');
+		$this->SetXY($x + 6, 138);
+		$this->Cell(10,6,$this->getDisplayDate($this->tempdata->mTime),0,0,'L');
 	
-		$this->SetXY($x + 33, 138);
-		$this->Cell(10,6,$this->getDisplayDate('20140912'),0,0,'L');
+		$this->SetXY($x + 36, 138);
+		$this->Cell(10,6,$this->getDisplayDate($this->tempdata->mArriveTime),0,0,'L');
 		
 	
 	}
 	
 	function processTable($index, $cList, $type)
 	{
-	
-
 		// 10 60  100  100
 		$this->SetLineWidth(0.8);
 		$x = 10;
@@ -767,23 +879,22 @@ class MYPDF extends MBFPDF
 	
 	
 	//output pdf file
-	function innerOutputPDF($type)
+	function innerOutputPDF()
 	{
 		
-		return $this->tempdata->mSerialNo;
-		
-		$fName = '20140411009970' . "_" . $type . ".pdf";
-	
+		$type = $this->tempdata->pdfType;
+		$fName = $this->tempdata->mSerialNo . "_" . $type . ".pdf";
 		$cList = array();
-		//if($type == 1){
-		//	$cList = $this->tempfile->products1;
-		//} else if($type == 2){
-		//	$cList = $this->tempfile->products2;
-		//} else if($type == 3){
-		//	$cList = $this->tempfile->products3;
-		//}
+		if($type == 1){
+			$cList = $this->tempdata->products1;
+		} else if($type == 2){
+			$cList = $this->tempdata->products2;
+		} else if($type == 3){
+			$cList = $this->tempdata->products3;
+		}
 	
-		$recordCount = 1;//count($cList);
+	
+		$recordCount = count($cList);
 		if($recordCount == 0){
 			return '';
 		}
@@ -808,7 +919,7 @@ class MYPDF extends MBFPDF
 			$this->AddPage();
 			$this->titleTable($type);
 			$this->infoTable();
-			$this->cartTable($i, null, $type);
+			$this->cartTable($i, $cList, $type);
 			$this->processTable($i, null, $type);
 			$this->packageTable();
 			$this->paymentTable();
@@ -817,13 +928,15 @@ class MYPDF extends MBFPDF
 			$this->memoTable2();
 		}
 	
-		$filePath = '/generatefile/pointBook_pdf/'.date("Ymdhisa");
-		if (!file_exists($filePath )) {
-			mkdir('.'.$filePath, 0777);
-		}
-		$fName = $filePath.'/'.$fName;
-	
-		$this->Output('.'.$fName ,'F');
+		//$filePath = '/generatefile/pointBook_pdf/'.date("Ymdhisa");
+		//if (!file_exists($filePath )) {
+		//	mkdir('.'.$filePath, 0777);
+		//}
+		//$fName = $filePath.'/'.$fName;
+		//
+		//$this->Output('.'.$fName ,'F');
+		
+		$this->Output();
 		return $fName;
 	}
 	//

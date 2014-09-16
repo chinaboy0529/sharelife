@@ -1,8 +1,7 @@
 <?php
 require ('psupport.php');
-require('utfConvert.php');
 
-$$postArray= $_POST['jsonData'] ;//get post data
+$postArray= $_POST['jsonData'] ;//get post data
 $tempData=new TempData();
 $opFlg =$tempData->init($postArray);            
 
@@ -13,8 +12,8 @@ $pdf = new MYPDF ( 'P', 'mm', 'A4' );
 $pdf->AddMBFont ( PMINCHO, 'SJIS' );
 $pdf->AddMBFont ( MINCHO, 'SJIS' );
 $pdf->init($tempData);
-$filePath = $pdf->innerOutputPDF(1);
-echo $filePath;
+$filePath = $pdf->innerOutputPDF();
+//echo $filePath;
 //
 
 
